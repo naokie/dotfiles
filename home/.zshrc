@@ -1,71 +1,159 @@
-[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+# Start configuration added by Zim install {{{
+#
+# User configuration sourced by interactive shells
+#
 
-# bindkey
+# -----------------
+# Zsh configuration
+# -----------------
+
+#
+# History
+#
+
+# Remove older command from the history if a duplicate is to be added.
+setopt HIST_IGNORE_ALL_DUPS
+
+#
+# Input/output
+#
+
+# Set editor default keymap to emacs (`-e`) or vi (`-v`)
 bindkey -e
 
-bindkey -M emacs '^P' history-substring-search-up
-bindkey -M emacs '^N' history-substring-search-down
+# Prompt for spelling correction of commands.
+#setopt CORRECT
 
-bindkey '^R' zaw-history
+# Customize spelling correction prompt.
+#SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
 
-# setopt
-setopt pushd_minus
+# Remove path separator from WORDCHARS.
+WORDCHARS=${WORDCHARS//[\/]}
 
-setopt no_beep
-setopt no_list_beep
-setopt no_hist_beep
+# -----------------
+# Zim configuration
+# -----------------
 
-setopt no_case_glob
-setopt extended_glob
+# Use degit instead of git as the default tool to install and update modules.
+#zstyle ':zim:zmodule' use 'degit'
 
-setopt hist_ignore_all_dups
-setopt hist_save_nodups
-setopt hist_ignore_space
-setopt append_history
+# --------------------
+# Module configuration
+# --------------------
 
-setopt always_last_prompt
-setopt auto_menu
-setopt globdots
+#
+# git
+#
 
-# zplug
-export ZPLUG_HOME=/usr/local/opt/zplug
-source $ZPLUG_HOME/init.zsh
+# Set a custom prefix for the generated aliases. The default prefix is 'G'.
+#zstyle ':zim:git' aliases-prefix 'g'
 
-zplug "yous/vanilli.sh"
+#
+# input
+#
 
-zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-syntax-highlighting", defer:2
-zplug "zsh-users/zsh-history-substring-search"
-zplug "zsh-users/zaw", use:zaw.zsh
-zstyle ':filter-select' case-insensitive yes
-zstyle ':filter-select' hist-find-no-dups yes
-zplug "hlissner/zsh-autopair", defer:2
+# Append `../` to your input for each `.` you type after an initial `..`
+zstyle ':zim:input' double-dot-expand yes
 
-zplug "glidenote/hub-zsh-completion"
-zplug "Dannyzen/cf-zsh-autocomplete-plugin"
-zplug "lukechilds/zsh-better-npm-completion", defer:2
-zplug "littleq0903/gcloud-zsh-completion", as:command, use:"src/*"
-zplug "b4b4r07/emoji-cli"
-zplug "lukechilds/zsh-nvm"
-zplug "g-plane/zsh-yarn-autocompletions", hook-build:"./zplug.zsh", defer:2
+#
+# termtitle
+#
 
-zplug "paulirish/git-open", as:plugin
-zplug "junegunn/fzf-bin", from:gh-r, as:command, rename-to:fzf, use:"*darwin*amd64*"
+# Set a custom terminal title format using prompt expansion escape sequences.
+# See http://zsh.sourceforge.net/Doc/Release/Prompt-Expansion.html#Simple-Prompt-Escapes
+# If none is provided, the default '%n@%m: %~' is used.
+#zstyle ':zim:termtitle' format '%1~'
 
-zplug "mafredri/zsh-async", from:github
-zplug "sindresorhus/pure", use:pure.zsh, from:github, as:theme
-# zplug "dracula/zsh", as:theme
+#
+# zsh-autosuggestions
+#
 
-zplug "lib/clipboard", from:oh-my-zsh, if:"[[ $OSTYPE == *darwin* ]]"
-zplug "peco/peco", as:command, from:gh-r
-zplug "rupa/z", use:z.sh
+# Disable automatic widget re-binding on each precmd. This can be set when
+# zsh-users/zsh-autosuggestions is the last module in your ~/.zimrc.
+ZSH_AUTOSUGGEST_MANUAL_REBIND=1
 
-# if ! zplug check --verbose; then
-# 	printf "Install? [y/N]: "
-# 	if read -q; then
-# 		echo; zplug install
-# 	fi
-# fi
+# Customize the style that the suggestions are shown with.
+# See https://github.com/zsh-users/zsh-autosuggestions/blob/master/README.md#suggestion-highlight-style
+#ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=242'
 
-zplug load --verbose
+#
+# zsh-syntax-highlighting
+#
+
+# Set what highlighters will be used.
+# See https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
+
+# Customize the main highlighter styles.
+# See https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters/main.md#how-to-tweak-it
+#typeset -A ZSH_HIGHLIGHT_STYLES
+#ZSH_HIGHLIGHT_STYLES[comment]='fg=242'
+
+# ------------------
+# Initialize modules
+# ------------------
+
+ZIM_HOME=${ZDOTDIR:-${HOME}}/.zim
+# Download zimfw plugin manager if missing.
+if [[ ! -e ${ZIM_HOME}/zimfw.zsh ]]; then
+  if (( ${+commands[curl]} )); then
+    curl -fsSL --create-dirs -o ${ZIM_HOME}/zimfw.zsh \
+        https://github.com/zimfw/zimfw/releases/latest/download/zimfw.zsh
+  else
+    mkdir -p ${ZIM_HOME} && wget -nv -O ${ZIM_HOME}/zimfw.zsh \
+        https://github.com/zimfw/zimfw/releases/latest/download/zimfw.zsh
+  fi
+fi
+# Install missing modules, and update ${ZIM_HOME}/init.zsh if missing or outdated.
+if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZDOTDIR:-${HOME}}/.zimrc ]]; then
+  source ${ZIM_HOME}/zimfw.zsh init -q
+fi
+# Initialize modules.
+source ${ZIM_HOME}/init.zsh
+
+# ------------------------------
+# Post-init module configuration
+# ------------------------------
+
+#
+# zsh-history-substring-search
+#
+
+zmodload -F zsh/terminfo +p:terminfo
+# Bind ^[[A/^[[B manually so up/down works both before and after zle-line-init
+for key ('^[[A' '^P' ${terminfo[kcuu1]}) bindkey ${key} history-substring-search-up
+for key ('^[[B' '^N' ${terminfo[kcud1]}) bindkey ${key} history-substring-search-down
+for key ('k') bindkey -M vicmd ${key} history-substring-search-up
+for key ('j') bindkey -M vicmd ${key} history-substring-search-down
+unset key
+# }}} End configuration added by Zim install
+
+# alias
+alias g="git"
+
+# npm
+alias npmplease="rm -rf node_modules/ && rm -f package-lock.json && npm install"
+alias ni='npm install'
+alias nid='npm install --save-dev'
+alias nig='npm install --global'
+alias nt='npm test'
+alias nit='npm install && npm test'
+alias nk='npm link'
+alias nr='npm run'
+alias ns='npm start'
+alias nf='npm cache clean && rm -rf node_modules && npm install'
+alias nlg='npm list --global --depth=0'
+alias yarnc="rm -rf node_modules/ && rm -f yarn.lock && yarn install"
+
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# zoxide
+eval "$(zoxide init zsh)"
+
+# fnm
+eval "$(fnm env --use-on-cd)"
+
+# google-cloud-sdk
+source "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
+source "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"

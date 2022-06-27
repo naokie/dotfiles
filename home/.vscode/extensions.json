@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    "editorconfig.editorconfig",
+    "usernamehw.errorlens",
+    "dbaeumer.vscode-eslint",
+    "file-icons.file-icons",
+    "eamodio.gitlens",
+    "lokalise.i18n-ally",
+    "davidanson.vscode-markdownlint",
+    "eg2.vscode-npm-script",
+    "quicktype.quicktype",
+    "pnp.polacode",
+    "esbenp.prettier-vscode",
+    "aaronthomas.vscode-snazzy-operator",
+    "richie5um2.vscode-sort-json",
+    "unional.vscode-sort-package-json",
+    "antfu.vite",
+    "vue.volar"
+  ]
+}

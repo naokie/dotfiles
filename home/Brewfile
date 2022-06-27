@@ -1,0 +1,31 @@
+# 'brew tap'
+tap "homebrew/cask"
+tap "git-friendly/git-friendly"
+
+# 'brewe install'
+brew "zsh"
+
+brew "bat"
+brew "diff-so-fancy"
+brew "direnv"
+brew "exa"
+brew "fd"
+brew "fnm"
+brew "fzf"
+brew "gh"
+brew "ghq"
+brew "git"
+brew "git-delta"
+brew "git-friendly/git-friendly/git-friendly"
+brew "git-lfs"
+brew "jq"
+brew "pnpm"
+brew "ripgrep"
+brew "sd"
+brew "tree"
+brew "zoxide"
+
+cask "alfred"
+cask "choosy"
+cask "google-cloud-sdk"
+cask "visual-studio-code"
